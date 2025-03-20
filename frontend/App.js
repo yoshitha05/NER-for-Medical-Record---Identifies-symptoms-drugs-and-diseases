@@ -1,12 +1,9 @@
 import React, { useState } from "react";
 
 const entityColors = {
-  "B-Sign_symptom": "#FFD700",  // Gold for symptoms
-  "I-Sign_symptom": "#FFD700",  // Gold for continuation of symptoms
-  "B-Medication": "#FF6347",    // Tomato red for medications
-  "I-Medication": "#FF6347",    // Tomato red for continuation of medications
-  "B-Disease": "#32CD32",       // Lime green for diseases
-  "I-Disease": "#32CD32"       // Lime green for diseases
+  "Sign_symptom": "#FFD700",  // Yellow (Symptoms)
+  "Disease_disorder": "#FF4500",  // OrangeRed (Diseases)
+  "Medication": "#556B2F"  // DarkOliveGreen (Drugs)
 };
 
 const App = () => {
@@ -27,6 +24,7 @@ const App = () => {
       }
 
       const data = await response.json();
+      console.log("NER Response:", data.entities); // Debugging log
       setEntities(data.entities);
       setError(null);
     } catch (error) {
@@ -49,7 +47,7 @@ const App = () => {
       alignItems: "center",
       flexDirection: "column",
       fontFamily: "'Arial', sans-serif",
-      background: "linear-gradient(to right, #ff9a9e, #fad0c4)", // Pink gradient background
+      background: "linear-gradient(to right, #ff9a9e, #fad0c4)", 
       color: "#333",
       padding: "20px"
     }}>
@@ -80,7 +78,7 @@ const App = () => {
             padding: "12px 20px",
             fontSize: "16px",
             cursor: "pointer",
-            backgroundColor: "#ff477e", // Pinkish-red button
+            backgroundColor: "#ff477e", 
             color: "#fff",
             border: "none",
             borderRadius: "8px",
@@ -97,7 +95,7 @@ const App = () => {
             padding: "12px 20px",
             fontSize: "16px",
             cursor: "pointer",
-            backgroundColor: "#f44336", // Red button
+            backgroundColor: "#f44336", 
             color: "#fff",
             border: "none",
             borderRadius: "8px",
@@ -132,15 +130,16 @@ const App = () => {
             <span 
               key={index}
               style={{
-                backgroundColor: entityColors[entity.entity] || "#ADD8E6", // Default blue if unknown entity
+                backgroundColor: entityColors[entity.entity] || "#ADD8E6",
                 padding: "5px 10px",
                 borderRadius: "8px",
                 margin: "4px",
                 fontWeight: "bold",
-                display: "inline-block"
+                display: "inline-block",
+                color: "#fff"
               }}
             >
-              {entity.word} ({entity.entity}) {`[${entity.score.toFixed(2)}]`}
+              {entity.word} ({entity.entity}) [{entity.score.toFixed(2)}]
             </span>
           ))
         ) : (
