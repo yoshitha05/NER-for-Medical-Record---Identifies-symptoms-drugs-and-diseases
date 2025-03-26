@@ -1,9 +1,14 @@
-from flask import Flask, request, jsonify
+from flask import Flask, send_from_directory, request, jsonify
+import os
 from flask_cors import CORS  # Import CORS
 from NER import perform_ner  # Importing the function from NER.py
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="templates/build", static_url_path="")
 CORS(app)  # Enable CORS for all routes
+
+@app.route("/")
+def serve_react():
+    return send_from_directory("templates/build", "index.html")
 
 @app.route('/ner', methods=['POST'])
 def analyze_text():
