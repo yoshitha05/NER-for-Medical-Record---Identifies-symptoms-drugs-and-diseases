@@ -1,38 +1,39 @@
-from transformers import AutoModelForTokenClassification, AutoTokenizer, pipeline
-MODEL_NAME = "d4data/biomedical-ner-all"
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-model = AutoModelForTokenClassification.from_pretrained(MODEL_NAME)
-nlp_pipeline = pipeline("ner", model=model, tokenizer=tokenizer, device=-1)
-ALLOWED_ENTITIES = {"Medication", "Sign_symptom", "Disease_disorder"}
+import spacy
+from spacy.tokens import Span
+from transformers import pipeline
 
-def predict_ner(text):
-    """Performs NER and filters only drugs, symptoms, and diseases."""
-    ner_results = nlp_pipeline(text)
-    filtered_results = [ent for ent in ner_results if ent['entity'].split("-")[-1] in ALLOWED_ENTITIES]
-    return merge_entities(filtered_results)
+# Load a medical NER model from Hugging Face
+nlp_ner = pipeline("ner", model="d4data/biomedical-ner-all", aggregation_strategy="simple")
 
-def merge_entities(ner_results):
-    """Merges subword tokens into full entities."""
-    merged = []
-    current_entity = None
+def perform_ner(text):
+    """Performs NER on the provided text and returns entities in JSON format."""
 
-    for ent in ner_results:
-        word = ent['word'].replace("##", "")  # Remove subword markers
-        entity_type = ent['entity'].split("-")[-1]  # Extract entity type
-        score = float(ent['score'])  # Convert to Python float
+    # Perform NER using the loaded model
+    entities = nlp_ner(text)
 
-        if entity_type in ALLOWED_ENTITIES:
-            if ent['entity'].startswith("B-") or (current_entity and current_entity["entity"] != entity_type):
-                # If a new entity starts or the entity type changes, store previous and start new
-                if current_entity:
-                    merged.append(current_entity)
-                current_entity = {"word": word, "entity": entity_type, "score": score}
-            else:
-                # Continue merging the current entity
-                current_entity["word"] += " " + word
-                current_entity["score"] = max(current_entity["score"], score)  # Keep highest confidence
+    # Convert Hugging Face entities to spaCy Span objects
+    nlp = spacy.blank("en")
+    doc = nlp(text)
+    spans = []
+    for ent in entities:
+        # Use char_span to create spans directly from character indices
+        span = doc.char_span(ent['start'], ent['end'], label=ent['entity_group'])
+        if not span:
+            # Fallback: manually create a span if char_span fails
+            span = Span(doc, doc.text[:ent['start']].count(" "), doc.text[:ent['end']].count(" "), label=ent['entity_group'])
+        spans.append(span)
+    doc.set_ents(spans, default="unmodified")
 
-    if current_entity:
-        merged.append(current_entity)
-
-    return merged
+    # Return structured JSON output
+    return {
+        "text": text,
+        "ents": [
+            {
+                "text": ent.text,
+                "label": ent.label_,
+                "start": ent.start_char,
+                "end": ent.end_char
+            }
+            for ent in doc.ents
+        ]
+    }
