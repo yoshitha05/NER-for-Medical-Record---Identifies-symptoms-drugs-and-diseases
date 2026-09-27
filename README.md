@@ -11,22 +11,24 @@ Finds and highlights **symptoms**, **drugs** and **diseases** in clinical notes,
 - Highlights entities in colour: 🟨 symptoms · 🟦 drugs · 🟥 diseases
 - Type or paste text, or upload a file: `.txt`, `.pdf`, `.docx`, `.png`, `.jpg`
 - Reads scanned PDFs and photos of documents with OCR
+- Detects **negation**: "denies fever", "no history of diabetes", "malaria ruled out" are **not highlighted**
 - Counts each entity type
 
 ## How it works
 
 ```
-text / file ──► OCR (if scanned) ──► spaCy EntityRuler ──► Hugging Face model ──► highlighted result
-                   Tesseract          medical dictionary     fills in the rest
+text / file ──► OCR (if scanned) ──► spaCy EntityRuler ──► Hugging Face model ──► negspacy ──► highlighted result
+                   Tesseract          medical dictionary     fills in the rest     negation
 ```
 
 1. **spaCy EntityRuler** matches known medical terms from a dictionary. This is fast and precise.
 2. **Hugging Face transformer** [`d4data/biomedical-ner-all`](https://huggingface.co/d4data/biomedical-ner-all), a DistilBERT model trained on clinical case reports, finds entities the dictionary doesn't know, such as *burning micturition* or *Montair LC*. Its labels are mapped to SYMPTOM, DRUG and DISEASE, and predictions below 0.5 confidence are dropped.
 3. Overlapping matches are merged, keeping the longest span.
+4. **negspacy** (NegEx algorithm, clinical term set) checks each entity's sentence for negation cues like *denies*, *no history of*, *negative for* and *ruled out*, and leaves negated entities unhighlighted.
 
 ## Tech stack
 
-Python · spaCy · Hugging Face Transformers · PyTorch · Tesseract OCR · PyMuPDF · Flask · React (Vite) · Gradio · Hugging Face Spaces (ZeroGPU)
+Python · spaCy · negspacy · Hugging Face Transformers · PyTorch · Tesseract OCR · PyMuPDF · Flask · React (Vite) · Gradio · Hugging Face Spaces (ZeroGPU)
 
 ## Project structure
 
@@ -70,7 +72,7 @@ The Hugging Face model (~260 MB) downloads on the first run.
 
 ## Limitations and next steps
 
-- **Negation:** "patient denies fever" still highlights *fever*. Next step: negation detection (e.g. `negspacy`).
+- **Negation scope:** negation is checked within a sentence, so "malaria ruled out, fever persists" also marks *fever* as negated.
 - **Small dictionary:** the spaCy rules cover common terms only, and the transformer handles the rest.
 - **OCR** works well on printed text but not on handwriting.
 - Not a medical device. This is for demonstration only.

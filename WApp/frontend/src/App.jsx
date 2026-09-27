@@ -95,11 +95,12 @@ export default function App() {
           <div className="legend">
             {LABELS.map((l) => (
               <span key={l} className={l}>
-                {l} ({result.ents.filter((e) => e.label === l).length})
+                {l} ({result.ents.filter((e) => e.label === l && !e.negated).length})
               </span>
             ))}
           </div>
-          <Highlighted text={result.text} ents={result.ents} />
+          {/* negated entities ("denies fever") are left as plain text */}
+          <Highlighted text={result.text} ents={result.ents.filter((e) => !e.negated)} />
         </>
       )}
     </main>
