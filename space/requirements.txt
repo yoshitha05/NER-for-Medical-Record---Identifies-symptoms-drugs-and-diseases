@@ -1,0 +1,7 @@
+spacy
+transformers
+torch
+pymupdf
+python-docx
+pytesseract
+pillow
