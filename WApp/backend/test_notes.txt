@@ -1,0 +1,23 @@
+# Test set for evaluate.py: one clinical note per line.
+# Mark every entity the patient HAS as [text](LABEL), with LABEL = SYMPTOM, DRUG or DISEASE.
+# Leave negated mentions ("denies fever") unmarked: the app should not highlight them.
+Patient presents with [high fever](SYMPTOM), [headache](SYMPTOM) and [body pain](SYMPTOM) for 3 days. Suspected [dengue](DISEASE). Advised [Dolo 650](DRUG) and [ORS](DRUG).
+Known case of [type 2 diabetes](DISEASE) and [hypertension](DISEASE) on [Metformin](DRUG) 500 mg and [Telmisartan](DRUG) 40 mg. Complains of [fatigue](SYMPTOM) and [blurred vision](SYMPTOM).
+Child brought with [dry cough](SYMPTOM), [wheezing](SYMPTOM) and [shortness of breath](SYMPTOM) since last night. History of [asthma](DISEASE). Started [Salbutamol](DRUG) nebulization and [Montelukast](DRUG).
+Patient denies fever, cough or chest pain. No history of diabetes. Complains only of mild [headache](SYMPTOM). Given [Paracetamol](DRUG).
+Complains of [burning micturition](SYMPTOM) and [frequent urination](SYMPTOM) for 2 days. Diagnosed with [urinary tract infection](DISEASE). Started on [Nitrofurantoin](DRUG).
+65-year-old female with [joint pain](SYMPTOM) and [morning stiffness](SYMPTOM) in both knees. Known case of [osteoarthritis](DISEASE). Prescribed [Aceclofenac](DRUG) and [Calcium carbonate](DRUG).
+Presented with [acidity](SYMPTOM), [heartburn](SYMPTOM) and [bloating](SYMPTOM) after meals. Diagnosed with [gastritis](DISEASE). Prescribed [Pantoprazole](DRUG) 40 mg and [Domperidone](DRUG).
+Admitted with [high fever](SYMPTOM), [chills](SYMPTOM) and [productive cough](SYMPTOM). Chest X-ray confirmed [pneumonia](DISEASE). Treated with [Ceftriaxone](DRUG) and [Azithromycin](DRUG).
+Malaria test negative. Typhoid ruled out. Patient reports [loose motions](SYMPTOM) and [vomiting](SYMPTOM) since morning. Advised [ORS](DRUG) and [Ondansetron](DRUG).
+Known [hypothyroidism](DISEASE) on [Thyronorm](DRUG) 50 mcg. Complains of [weight gain](SYMPTOM), [tiredness](SYMPTOM) and constipation is absent.
+Patient has [palpitations](SYMPTOM) and [chest pain](SYMPTOM) on exertion. History of [coronary artery disease](DISEASE). Continued [Aspirin](DRUG), [Atorvastatin](DRUG) and [Metoprolol](DRUG).
+Complains of [sneezing](SYMPTOM), [runny nose](SYMPTOM) and [itching](SYMPTOM) in the eyes. Diagnosed with [allergic rhinitis](DISEASE). Given [Levocetirizine](DRUG).
+Patient with [severe headache](SYMPTOM), [nausea](SYMPTOM) and [photophobia](SYMPTOM). History of [migraine](DISEASE). Given [Sumatriptan](DRUG). No vomiting.
+Pregnant woman with [anemia](DISEASE), [weakness](SYMPTOM) and [dizziness](SYMPTOM). Started on [folic acid](DRUG) and [iron supplements](DRUG).
+Presented with [yellowing of skin](SYMPTOM), [loss of appetite](SYMPTOM) and [abdominal pain](SYMPTOM). Diagnosed with [hepatitis A](DISEASE). No fever.
+Elderly male with [lower back pain](SYMPTOM) radiating to the leg and [numbness](SYMPTOM). Known case of [spondylosis](DISEASE). Advised [Pregabalin](DRUG) and physiotherapy.
+Patient reports [skin rash](SYMPTOM) with [itching](SYMPTOM) on both arms. Diagnosed with [eczema](DISEASE). Prescribed [Hydrocortisone](DRUG) cream and [Cetirizine](DRUG).
+Follow-up for [chronic kidney disease](DISEASE) and [gout](DISEASE). Complains of [swelling](SYMPTOM) in the feet. Started [Furosemide](DRUG) and [Febuxostat](DRUG).
+[Sore throat](SYMPTOM), [mild fever](SYMPTOM) and [difficulty swallowing](SYMPTOM) for 2 days. Diagnosed with [tonsillitis](DISEASE). Prescribed [Amoxicillin](DRUG). Denies cough.
+Patient with [depression](DISEASE) and [insomnia](SYMPTOM). Started on [Escitalopram](DRUG) 10 mg. Denies suicidal thoughts. No history of epilepsy.

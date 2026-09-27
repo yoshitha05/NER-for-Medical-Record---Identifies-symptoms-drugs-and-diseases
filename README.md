@@ -12,6 +12,7 @@ Finds and highlights **symptoms**, **drugs** and **diseases** in clinical notes,
 - Type or paste text, or upload a file: `.txt`, `.pdf`, `.docx`, `.png`, `.jpg`
 - Reads scanned PDFs and photos of documents with OCR
 - Detects **negation**: "denies fever", "no history of diabetes", "malaria ruled out" are **not highlighted**
+- Medical dictionary of ~350 terms, including common Indian drug brands (Dolo 650, Pan 40, Glycomet, Telma…)
 - Counts each entity type
 
 ## How it works
@@ -26,6 +27,23 @@ text / file ──► OCR (if scanned) ──► spaCy EntityRuler ──► Hug
 3. Overlapping matches are merged, keeping the longest span.
 4. **negspacy** (NegEx algorithm, clinical term set) checks each entity's sentence for negation cues like *denies*, *no history of*, *negative for* and *ruled out*, and leaves negated entities unhighlighted.
 
+## Accuracy
+
+`WApp/backend/evaluate.py` scores the model on 20 annotated clinical notes (`test_notes.txt`) and reports precision, recall and F1 per entity type, plus a list of every mistake:
+
+```bash
+cd WApp/backend
+python evaluate.py              # dictionary + Hugging Face model
+USE_HF=0 python evaluate.py     # dictionary only, to compare
+```
+
+| Setup | Symptom F1 | Drug F1 | Disease F1 | Overall F1 |
+|---|---|---|---|---|
+| Dictionary only | 94% | 97% | 95% | 95% |
+| Dictionary + Hugging Face | _run to fill in_ | | | |
+
+The test notes were written for this project, so these scores are optimistic. A public annotated dataset would give a more reliable number.
+
 ## Tech stack
 
 Python · spaCy · negspacy · Hugging Face Transformers · PyTorch · Tesseract OCR · PyMuPDF · Flask · React (Vite) · Gradio · Hugging Face Spaces (ZeroGPU)
@@ -35,7 +53,7 @@ Python · spaCy · negspacy · Hugging Face Transformers · PyTorch · Tesseract
 ```
 ├── space/              Gradio app deployed on Hugging Face Spaces (live demo)
 └── WApp/
-    ├── backend/        Flask API: /ner (text) and /upload (files)
+    ├── backend/        Flask API: /ner (text) and /upload (files), evaluate.py, test_notes.txt
     └── frontend/       React web app
 ```
 
@@ -73,6 +91,6 @@ The Hugging Face model (~260 MB) downloads on the first run.
 ## Limitations and next steps
 
 - **Negation scope:** negation is checked within a sentence, so "malaria ruled out, fever persists" also marks *fever* as negated.
-- **Small dictionary:** the spaCy rules cover common terms only, and the transformer handles the rest.
+- **Dictionary coverage:** terms outside the dictionary (e.g. *photophobia*, *Pregabalin*) depend on the transformer.
 - **OCR** works well on printed text but not on handwriting.
 - Not a medical device. This is for demonstration only.
