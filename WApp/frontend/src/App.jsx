@@ -1,7 +1,10 @@
 import { useState } from "react";
 import "./App.css";
+import { analyzeWithSpace } from "./space";
 
-// Backend URL: set VITE_API_URL on Render; falls back to your local backend
+// Online (Vercel): VITE_USE_SPACE=true sends requests to the Hugging Face Space.
+// On your laptop: uses the local Flask backend.
+const USE_SPACE = import.meta.env.VITE_USE_SPACE === "true";
 const API = import.meta.env.VITE_API_URL || "http://localhost:5001";
 const LABELS = ["SYMPTOM", "DRUG", "DISEASE"];
 
@@ -28,13 +31,18 @@ export default function App() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function send(url, options) {
+  async function send(url, options, spaceInput) {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(url, options);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      let data;
+      if (USE_SPACE) {
+        data = await analyzeWithSpace(spaceInput.text, spaceInput.file);
+      } else {
+        const res = await fetch(url, options);
+        data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+      }
       setResult(data);
       setText(data.text);
     } catch (err) {
@@ -48,14 +56,14 @@ export default function App() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text }),
-    });
+    }, { text });
 
   const uploadFile = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     const form = new FormData();
     form.append("file", file);
-    send(`${API}/upload`, { method: "POST", body: form });
+    send(`${API}/upload`, { method: "POST", body: form }, { file });
     e.target.value = ""; // allow uploading the same file again
   };
 
