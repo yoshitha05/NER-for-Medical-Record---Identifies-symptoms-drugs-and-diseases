@@ -37,10 +37,10 @@ python evaluate.py              # dictionary + Hugging Face model
 USE_HF=0 python evaluate.py     # dictionary only, to compare
 ```
 
-| Setup | Symptom F1 | Drug F1 | Disease F1 | Overall F1 |
-|---|---|---|---|---|
-| Dictionary only | 94% | 97% | 95% | 95% |
-| Dictionary + Hugging Face | _run to fill in_ | | | |
+| Setup | Symptom F1 | Drug F1 | Disease F1 | Overall F1 (exact) | Overall F1 (overlap) |
+|---|---|---|---|---|---|
+| Dictionary only | 94% | 97% | 95% | 95% | 96% |
+| Dictionary + Hugging Face | 95% | 92% | 95% | 94% | **98%** |
 
 The test notes were written for this project, so these scores are optimistic. A public annotated dataset would give a more reliable number.
 
