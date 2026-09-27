@@ -23,6 +23,7 @@ RUN python -c "from transformers import pipeline; pipeline('ner', model='d4data/
 
 COPY --chown=user . .
 
-# Spaces expects the app on port 7860
+# Cloud Run / Render give the port in $PORT; defaults to 7860 otherwise
+ENV PORT=7860
 EXPOSE 7860
-CMD ["gunicorn", "--bind", "0.0.0.0:7860", "--workers", "1", "--timeout", "180", "app:app"]
+CMD gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 180 app:app
