@@ -69,6 +69,7 @@ DRUGS = [
     # brain and mind
     "sertraline", "fluoxetine", "escitalopram", "amitriptyline", "alprazolam", "clonazepam",
     "levetiracetam", "phenytoin", "sodium valproate", "sumatriptan", "betahistine",
+    "pregabalin", "gabapentin",
 ]
 
 SYMPTOMS = [

@@ -25,7 +25,7 @@ text / file ──► OCR (if scanned) ──► spaCy EntityRuler ──► Hug
 1. **spaCy EntityRuler** matches known medical terms from a dictionary. This is fast and precise.
 2. **Hugging Face transformer** [`d4data/biomedical-ner-all`](https://huggingface.co/d4data/biomedical-ner-all), a DistilBERT model trained on clinical case reports, finds entities the dictionary doesn't know, such as *burning micturition* or *Montair LC*. Its labels are mapped to SYMPTOM, DRUG and DISEASE, and predictions below 0.5 confidence are dropped.
 3. Overlapping matches are merged, keeping the longest span.
-4. **negspacy** (NegEx algorithm, clinical term set) checks each entity's sentence for negation cues like *denies*, *no history of*, *negative for* and *ruled out*, and leaves negated entities unhighlighted.
+4. **negspacy** (NegEx algorithm, clinical term set) checks each entity's sentence for negation cues before it, like *denies*, *no history of* and *negative for*. Cues after an entity (*absent*, *ruled out*, *test negative*) only negate the entity directly before them. Negated entities are left unhighlighted.
 
 ## Accuracy
 
@@ -39,10 +39,10 @@ USE_HF=0 python evaluate.py     # dictionary only, to compare
 
 | Setup | Symptom F1 | Drug F1 | Disease F1 | Overall F1 (exact) | Overall F1 (overlap) |
 |---|---|---|---|---|---|
-| Dictionary only | 94% | 97% | 95% | 95% | 96% |
-| Dictionary + Hugging Face | 95% | 92% | 95% | 94% | **98%** |
+| Dictionary only | 97% | 98% | 95% | 97% | 98% |
+| Dictionary + Hugging Face | 98% | 94% | 95% | 96% | **100%** |
 
-The test notes were written for this project, so these scores are optimistic. A public annotated dataset would give a more reliable number.
+The test notes were written for this project, and the dictionary was improved after seeing some of its errors (e.g. adding *Pregabalin*), so these scores are optimistic. A public annotated dataset would give a more reliable number.
 
 ## Tech stack
 
@@ -90,7 +90,7 @@ The Hugging Face model (~260 MB) downloads on the first run.
 
 ## Limitations and next steps
 
-- **Negation scope:** negation is checked within a sentence, so "malaria ruled out, fever persists" also marks *fever* as negated.
+- **Negation scope:** "ruled out" can also negate what comes after it, so in "malaria ruled out, fever persists" *fever* is wrongly treated as negated.
 - **Dictionary coverage:** terms outside the dictionary (e.g. *photophobia*, *Pregabalin*) depend on the transformer.
 - **OCR** works well on printed text but not on handwriting.
 - Not a medical device. This is for demonstration only.
