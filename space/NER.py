@@ -1,12 +1,14 @@
 # `spaces` must be imported before torch/transformers on a ZeroGPU Space.
-# On the Space the model runs on a GPU; on your laptop it runs on the CPU.
+# The model runs on the CPU: DistilBERT is small and fast enough, and CPU time has no daily
+# quota (free ZeroGPU time runs out quickly for visitors who are not logged in).
 try:
     import spaces  # only installed on Hugging Face Spaces
-    gpu = spaces.GPU
-    DEVICE = "cuda"
+
+    @spaces.GPU
+    def _gpu_placeholder():  # a ZeroGPU Space needs at least one GPU function to start; never called
+        pass
 except ImportError:
-    gpu = lambda fn: fn  # no-op locally
-    DEVICE = -1  # CPU
+    pass
 
 import spacy
 from spacy.util import filter_spans
@@ -28,15 +30,25 @@ ruler.add_patterns(
 
 # 2. Negation: marks entities the patient does NOT have ("denies fever", "no history of diabetes")
 negation_terms = termset("en_clinical")
-negation_terms.add_patterns({"following_negations": ["ruled out", "absent", "not present", "negative"]})
+# Words AFTER an entity ("absent", "ruled out") are handled by negated_by_next_words() below,
+# because negspacy would apply them to the whole sentence before them.
+negation_terms.remove_patterns({"following_negations": negation_terms.get_patterns()["following_negations"]})
 negex = nlp.add_pipe("negex", config={"neg_termset": negation_terms.get_patterns()})
 
+FOLLOWING_NEGATIONS = ("ruled out", "absent", "not present", "negative", "unlikely", "excluded", "declined", "free")
+FILLER_WORDS = {"is", "was", "are", "were", "been", "has", "have", "test", "tests", "also", "now"}
+
+
+def negated_by_next_words(ent):
+    """'Malaria ruled out', 'constipation is absent': only the entity right before the cue is negated."""
+    next_words = [t.lower_ for t in ent.doc[ent.end: ent.end + 5] if t.lower_ not in FILLER_WORDS]
+    return " ".join(next_words).startswith(FOLLOWING_NEGATIONS)
+
 # 3. Hugging Face model fills in what the dictionary misses
-hf_ner = pipeline("ner", model="d4data/biomedical-ner-all", aggregation_strategy="simple", device=DEVICE)
+hf_ner = pipeline("ner", model="d4data/biomedical-ner-all", aggregation_strategy="simple", device=-1)  # CPU
 LABEL_MAP = {"Sign_symptom": "SYMPTOM", "Disease_disorder": "DISEASE", "Medication": "DRUG"}
 
 
-@gpu
 def run_hf(text):
     return hf_ner(text)
 
@@ -55,6 +67,9 @@ def perform_ner(text):
     # Remove overlaps: keeps the longest span (e.g. "chest pain" over "pain")
     doc.ents = filter_spans(spans)
     negex(doc)  # run negation again so it also covers entities found by the Hugging Face model
+    for ent in doc.ents:
+        if not ent._.negex and negated_by_next_words(ent):
+            ent._.negex = True
 
     return {
         "text": text,
