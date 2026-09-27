@@ -1,3 +1,8 @@
+try:
+    import spaces  # noqa: F401  (must come first on a ZeroGPU Space)
+except ImportError:
+    pass
+
 import gradio as gr
 import pymupdf
 import pytesseract
