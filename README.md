@@ -2,7 +2,7 @@
 
 Finds and highlights **symptoms**, **drugs** and **diseases** in clinical notes, prescriptions and discharge summaries.
 
-**Live demo:** https://huggingface.co/spaces/yoshitha19/medical-ner
+**Live demo:** https://ner-for-medical-record-identifies-s.vercel.app 
 
 ![Screenshot](screenshot.png)
 
