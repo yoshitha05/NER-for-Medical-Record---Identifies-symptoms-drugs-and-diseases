@@ -4,7 +4,7 @@ import { analyzeWithSpace } from "./space";
 
 // Online (Vercel): VITE_USE_SPACE=true sends requests to the Hugging Face Space.
 // On your laptop: uses the local Flask backend.
-const USE_SPACE = import.meta.env.VITE_USE_SPACE === "true";
+const USE_SPACE = import.meta.env.PROD || import.meta.env.VITE_USE_SPACE === "true";
 const API = import.meta.env.VITE_API_URL || "http://localhost:5001";
 const LABELS = ["SYMPTOM", "DRUG", "DISEASE"];
 
