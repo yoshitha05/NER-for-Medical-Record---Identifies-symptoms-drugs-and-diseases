@@ -14,14 +14,16 @@ from negspacy.negation import Negex  # noqa: F401  (registers the "negex" compon
 from negspacy.termsets import termset
 from transformers import pipeline
 
-# 1. spaCy pipeline with a small medical dictionary
+from medical_terms import DISEASES, DRUGS, SYMPTOMS
+
+# 1. spaCy pipeline with a medical dictionary (medical_terms.py)
 nlp = spacy.blank("en")
 nlp.add_pipe("sentencizer")  # negation only looks within the same sentence
 ruler = nlp.add_pipe("entity_ruler", config={"phrase_matcher_attr": "LOWER"})
 ruler.add_patterns(
-    [{"label": "DISEASE", "pattern": t} for t in ["diabetes", "hypertension", "asthma", "dengue", "malaria", "typhoid", "migraine"]]
-    + [{"label": "DRUG", "pattern": t} for t in ["paracetamol", "dolo 650", "metformin", "azithromycin", "ibuprofen", "insulin"]]
-    + [{"label": "SYMPTOM", "pattern": t} for t in ["fever", "cough", "headache", "vomiting", "fatigue", "chest pain", "body pain"]]
+    [{"label": "DISEASE", "pattern": t} for t in DISEASES]
+    + [{"label": "DRUG", "pattern": t} for t in DRUGS]
+    + [{"label": "SYMPTOM", "pattern": t} for t in SYMPTOMS]
 )
 
 # 2. Negation: marks entities the patient does NOT have ("denies fever", "no history of diabetes")
