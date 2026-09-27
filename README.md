@@ -2,7 +2,7 @@
 
 Finds and highlights **symptoms**, **drugs** and **diseases** in clinical notes, prescriptions and discharge summaries.
 
-**Live demo:** https://ner-for-medical-record-identifies-s.vercel.app 
+**Live demo:** https://ner-for-medical-record-identifies-s.vercel.app · Flutter app in `flutter_app/`
 
 ![Screenshot](screenshot.png)
 
@@ -46,15 +46,16 @@ The test notes were written for this project, and the dictionary was improved af
 
 ## Tech stack
 
-Python · spaCy · negspacy · Hugging Face Transformers · PyTorch · Tesseract OCR · PyMuPDF · Flask · React (Vite) · Gradio · Hugging Face Spaces (ZeroGPU)
+Python · spaCy · negspacy · Hugging Face Transformers · PyTorch · Tesseract OCR · PyMuPDF · Flask · React (Vite) · Flutter · Gradio · Hugging Face Spaces · Vercel
 
 ## Project structure
 
 ```
-├── space/              Gradio app deployed on Hugging Face Spaces (live demo)
+├── space/              Gradio app on Hugging Face Spaces: the live backend (/analyze API)
+├── flutter_app/        Flutter app (web, Android) that calls the Space
 └── WApp/
     ├── backend/        Flask API: /ner (text) and /upload (files), evaluate.py, test_notes.txt
-    └── frontend/       React web app
+    └── frontend/       React web app, deployed on Vercel (calls the Space in production)
 ```
 
 ## Run locally
@@ -87,6 +88,14 @@ python app.py                   # http://localhost:7860
 ```
 
 The Hugging Face model (~260 MB) downloads on the first run.
+
+**Or the Flutter app**
+
+```bash
+cd flutter_app
+flutter pub get
+flutter run -d chrome           # or: flutter run (Android phone / emulator)
+```
 
 ## Limitations and next steps
 
