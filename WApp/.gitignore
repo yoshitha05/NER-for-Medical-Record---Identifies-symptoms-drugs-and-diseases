@@ -1,0 +1,26 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+.python-version
+
+# Node / Vite
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Logs
+logs/
+*.log
+
+# Trained model
+WApp/backend/model/
+
+# Editor and OS
+.vscode/
+.idea/
+.DS_Store
+
+# Secrets
+.env

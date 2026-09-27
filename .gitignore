@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+*.pyc
+.python-version
+node_modules/
+dist/
+*.log
+WApp/backend/model/
+.vscode/
+.DS_Store
+.env

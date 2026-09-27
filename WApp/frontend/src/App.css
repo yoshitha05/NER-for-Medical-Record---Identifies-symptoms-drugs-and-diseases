@@ -1,0 +1,40 @@
+/* Background photo: save it as frontend/public/background.jpg
+   The white layer on top makes the photo lighter.
+   Change 0.8 to make it lighter (0.9) or show more of the photo (0.6). */
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0)),
+    url("/Med.webp") center / cover no-repeat fixed;
+  background-color: white;
+}
+
+main { max-width: 860px; margin: 0 auto; padding: 32px 16px; font-family: system-ui, sans-serif; }
+h1 { margin-bottom: 16px; }
+
+textarea { width: 100%; min-height: 160px; padding: 12px; font: inherit; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+
+.actions { display: flex; gap: 10px; margin: 12px 0 20px; flex-wrap: wrap; }
+button, .upload { padding: 10px 18px; border-radius: 8px; border: 0; font: inherit; cursor: pointer; }
+button { background: #0d9488; color: white; font-weight: 600; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); }
+button:hover:not(:disabled) { background: #0f766e; }
+button:disabled { opacity: 0.9; cursor: not-allowed; }
+
+.clear { background: #e11d48; }
+.clear:hover:not(:disabled) { background: #be123c; }
+.upload { background: #e5e7eb; color: #111; }
+
+.error { color: #dc2626; }
+
+.legend { display: flex; gap: 8px; margin-bottom: 12px; }
+.legend span { padding: 4px 12px; border-radius: 999px; font-size: 14px; color: #111; }
+
+.result { white-space: pre-wrap; line-height: 2.2; padding: 16px; border: 1px solid #ddd; border-radius: 8px; background: white; color: #111; }
+
+mark { padding: 2px 6px; border-radius: 4px; color: #111; }
+
+/* Colours for each entity type */
+.SYMPTOM { background: #fde68a; }  /* yellow */
+.DRUG    { background: #93c5fd; }  /* blue */
+.DISEASE { background: #fca5a5; }  /* red */
