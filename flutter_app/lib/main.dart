@@ -1,6 +1,5 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 import 'ner_api.dart';
 
@@ -82,19 +81,6 @@ class _HomePageState extends State<HomePage> {
     _run(() => NerApi.analyze(fileBytes: bytes, fileName: file.name));
   }
 
-  Future<void> _takePhoto() async {
-    XFile? photo;
-    try {
-      photo = await ImagePicker().pickImage(source: ImageSource.camera, imageQuality: 85);
-    } catch (_) {
-      setState(() => _error = 'Camera is not available on this device. Use Upload file instead.');
-      return;
-    }
-    if (photo == null) return;
-    final bytes = await photo.readAsBytes();
-    _run(() => NerApi.analyze(fileBytes: bytes, fileName: 'photo.jpg'));
-  }
-
   void _clear() {
     setState(() {
       _controller.clear();
@@ -152,11 +138,6 @@ class _HomePageState extends State<HomePage> {
                         onPressed: _loading ? null : _pickFile,
                         icon: const Icon(Icons.upload_file),
                         label: const Text('Upload file'),
-                      ),
-                      OutlinedButton.icon(
-                        onPressed: _loading ? null : _takePhoto,
-                        icon: const Icon(Icons.photo_camera),
-                        label: const Text('Camera'),
                       ),
                       FilledButton(
                         style: FilledButton.styleFrom(backgroundColor: const Color(0xFFE11D48)),
