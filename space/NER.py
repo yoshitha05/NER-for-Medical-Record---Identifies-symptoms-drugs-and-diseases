@@ -10,10 +10,13 @@ except ImportError:
 
 import spacy
 from spacy.util import filter_spans
+from negspacy.negation import Negex  # noqa: F401  (registers the "negex" component)
+from negspacy.termsets import termset
 from transformers import pipeline
 
 # 1. spaCy pipeline with a small medical dictionary
 nlp = spacy.blank("en")
+nlp.add_pipe("sentencizer")  # negation only looks within the same sentence
 ruler = nlp.add_pipe("entity_ruler", config={"phrase_matcher_attr": "LOWER"})
 ruler.add_patterns(
     [{"label": "DISEASE", "pattern": t} for t in ["diabetes", "hypertension", "asthma", "dengue", "malaria", "typhoid", "migraine"]]
@@ -21,7 +24,12 @@ ruler.add_patterns(
     + [{"label": "SYMPTOM", "pattern": t} for t in ["fever", "cough", "headache", "vomiting", "fatigue", "chest pain", "body pain"]]
 )
 
-# 2. Hugging Face model fills in what the dictionary misses
+# 2. Negation: marks entities the patient does NOT have ("denies fever", "no history of diabetes")
+negation_terms = termset("en_clinical")
+negation_terms.add_patterns({"following_negations": ["ruled out", "absent", "not present", "negative"]})
+negex = nlp.add_pipe("negex", config={"neg_termset": negation_terms.get_patterns()})
+
+# 3. Hugging Face model fills in what the dictionary misses
 hf_ner = pipeline("ner", model="d4data/biomedical-ner-all", aggregation_strategy="simple", device=DEVICE)
 LABEL_MAP = {"Sign_symptom": "SYMPTOM", "Disease_disorder": "DISEASE", "Medication": "DRUG"}
 
@@ -44,15 +52,16 @@ def perform_ner(text):
 
     # Remove overlaps: keeps the longest span (e.g. "chest pain" over "pain")
     doc.ents = filter_spans(spans)
+    negex(doc)  # run negation again so it also covers entities found by the Hugging Face model
 
     return {
         "text": text,
         "ents": [
-            {"text": e.text, "label": e.label_, "start": e.start_char, "end": e.end_char}
+            {"text": e.text, "label": e.label_, "start": e.start_char, "end": e.end_char, "negated": e._.negex}
             for e in doc.ents
         ],
     }
 
 
 if __name__ == "__main__":
-    print(perform_ner("Patient has fever and burning micturition, known diabetes, given Dolo 650 and Montair LC."))
+    print(perform_ner("Patient denies fever and burning micturition. No history of diabetes. Has headache. Given Dolo 650."))

@@ -51,10 +51,14 @@ def analyze(text, file):
     result = perform_ner(text)
     highlighted = {
         "text": result["text"],
-        "entities": [{"entity": e["label"], "start": e["start"], "end": e["end"]} for e in result["ents"]],
+        # negated entities ("denies fever") are left as plain text
+        "entities": [
+            {"entity": e["label"], "start": e["start"], "end": e["end"]}
+            for e in result["ents"] if not e["negated"]
+        ],
     }
     counts = " · ".join(
-        f"**{label}**: {sum(e['label'] == label for e in result['ents'])}" for label in COLORS
+        f"**{label}**: {sum(e['entity'] == label for e in highlighted['entities'])}" for label in COLORS
     )
     return text, highlighted, counts
 
@@ -66,13 +70,16 @@ EXAMPLES = [
     "Amlodipine 5 mg. Complains of fatigue, frequent urination and blurred vision.",
     "Child brought with dry cough, wheezing and shortness of breath since last night. History of asthma. "
     "Started on Montelukast and Budesonide inhaler.",
+    "Patient denies fever, cough or chest pain. No history of diabetes. Malaria ruled out. "
+    "Complains only of mild headache. Given Paracetamol.",
 ]
 
 with gr.Blocks(title="NER in Medical Records") as demo:
     gr.Markdown(
         "# 🩺 NER in Medical Records\n"
         "Highlights **symptoms**, **drugs** and **diseases** in clinical text using spaCy and the "
-        "Hugging Face model `d4data/biomedical-ner-all`."
+        "Hugging Face model `d4data/biomedical-ner-all`. Things the patient does **not** have "
+        "(\"denies fever\", \"no history of diabetes\") are not highlighted."
     )
 
     text = gr.Textbox(label="Clinical note", lines=6, placeholder="Type or paste a clinical note...")
