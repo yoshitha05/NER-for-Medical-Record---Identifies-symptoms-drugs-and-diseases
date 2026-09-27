@@ -1,6 +1,7 @@
 import io
+import os
 
-import fitz  # PyMuPDF
+import pymupdf as fitz
 import pytesseract
 from docx import Document
 from flask import Flask, request, jsonify
@@ -10,6 +11,7 @@ from PIL import Image
 from NER import perform_ner
 
 app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10 MB upload limit
 CORS(app)
 
 IMAGE_TYPES = (".png", ".jpg", ".jpeg")
@@ -43,6 +45,16 @@ def read_file(file):
     raise ValueError("Supported files: .txt, .pdf, .docx, .png, .jpg")
 
 
+@app.errorhandler(413)
+def too_large(_):
+    return jsonify({"error": "File is too large (max 10 MB)"}), 413
+
+
+@app.route("/")
+def health():
+    return jsonify({"status": "ok"})
+
+
 @app.route("/ner", methods=["POST"])
 def analyze_text():
     text = (request.get_json(silent=True) or {}).get("text", "")
@@ -70,4 +82,4 @@ def analyze_file():
 
 
 if __name__ == "__main__":
-    app.run(port=5001, debug=True)
+    app.run(port=int(os.getenv("PORT", 5001)), debug=True)

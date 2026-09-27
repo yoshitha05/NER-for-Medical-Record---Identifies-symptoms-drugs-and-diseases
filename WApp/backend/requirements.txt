@@ -7,3 +7,4 @@ pymupdf
 python-docx
 pytesseract
 pillow
+gunicorn

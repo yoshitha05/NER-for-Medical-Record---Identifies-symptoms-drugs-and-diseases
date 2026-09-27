@@ -1,7 +1,8 @@
 import { useState } from "react";
 import "./App.css";
 
-const API = "http://localhost:5001";
+// Backend URL: set VITE_API_URL on Render; falls back to your local backend
+const API = import.meta.env.VITE_API_URL || "http://localhost:5001";
 const LABELS = ["SYMPTOM", "DRUG", "DISEASE"];
 
 // Split the text into plain parts and highlighted entity parts
